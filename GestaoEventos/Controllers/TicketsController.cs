@@ -33,7 +33,7 @@ namespace GestaoEventos.Controllers
             {
                 EventId = ev.Id,
                 BuyerId = dto.BuyerId,
-                PurchaseDate = DateTime.Now
+                PurchaseDate = DateTime.UtcNow // Use UTC para evitar conflito com o PostgreSQL
             };
 
             _context.Tickets.Add(ticket);
@@ -41,6 +41,7 @@ namespace GestaoEventos.Controllers
 
             return Ok(ticket);
         }
+
 
         // GET api/tickets/client/{clientId} – lista os ingressos comprados por um cliente
         [HttpGet("client/{clientId}")]
