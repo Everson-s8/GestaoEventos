@@ -3,6 +3,7 @@ using System;
 using GestaoEventos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227194947_AddCategoryToEventProduct")]
+    partial class AddCategoryToEventProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,59 +170,6 @@ namespace GestaoEventos.Migrations
                     b.ToTable("EventStaffs");
                 });
 
-            modelBuilder.Entity("GestaoEventos.Models.Order", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BuyerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BuyerId");
-
-                    b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("GestaoEventos.Models.OrderItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderItems");
-                });
-
             modelBuilder.Entity("GestaoEventos.Models.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -285,36 +235,6 @@ namespace GestaoEventos.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("GestaoEventos.Models.Order", b =>
-                {
-                    b.HasOne("GestaoEventos.Models.User", "Buyer")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Buyer");
-                });
-
-            modelBuilder.Entity("GestaoEventos.Models.OrderItem", b =>
-                {
-                    b.HasOne("GestaoEventos.Models.Order", "Order")
-                        .WithMany("Items")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GestaoEventos.Models.EventProduct", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("GestaoEventos.Models.Ticket", b =>
                 {
                     b.HasOne("GestaoEventos.Models.User", "Buyer")
@@ -332,11 +252,6 @@ namespace GestaoEventos.Migrations
                     b.Navigation("Buyer");
 
                     b.Navigation("Event");
-                });
-
-            modelBuilder.Entity("GestaoEventos.Models.Order", b =>
-                {
-                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

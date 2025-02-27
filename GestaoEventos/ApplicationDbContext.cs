@@ -18,6 +18,9 @@ namespace GestaoEventos.Data
         public DbSet<EventProduct> EventProducts { get; set; }
         public DbSet<EventNotification> EventNotifications { get; set; }
         public object EventProduct { get; internal set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +32,19 @@ namespace GestaoEventos.Data
                 .HasForeignKey(e => e.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Configuração da relação Order -> User (Buyer)
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Buyer)
+                .WithMany() // ou .WithMany(u => u.Orders) se o User tiver uma coleção de Orders
+                .HasForeignKey(o => o.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configuração da relação OrderItem -> EventProduct
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(oi => oi.Product)
+                .WithMany() // ou .WithMany(p => p.OrderItems) se EventProduct tiver uma coleção de OrderItems
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
 
