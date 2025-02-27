@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250227023258_InitialClean")]
-    partial class InitialClean
+    [Migration("20250227195735_AddCategoryToEventProduct")]
+    partial class AddCategoryToEventProduct
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,15 +107,19 @@ namespace GestaoEventos.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EventId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("ImageUrl")
+                    b.Property<byte[]>("ImageData")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("bytea");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -157,6 +161,9 @@ namespace GestaoEventos.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

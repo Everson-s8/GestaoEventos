@@ -19,6 +19,9 @@ namespace GestaoEventos.Models
         [Required]
         public int Quantity { get; set; }
 
+        [Required]
+        public string Category { get; set; }
+
         // Armazena os dados binários da imagem (coluna do tipo bytea no PostgreSQL)
         [Required]
         public byte[] ImageData { get; set; }

@@ -26,6 +26,12 @@ namespace GestaoEventos.Controllers
         [HttpPost("{eventId}/staff")]
         public async Task<IActionResult> AddStaff(int eventId, [FromBody] AddStaffDto dto)
         {
+
+            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            {
+                return BadRequest("Email já está em uso.");
+            }
+
             // Cria o registro de EventStaff
             var staff = new EventStaff
             {
@@ -107,6 +113,7 @@ namespace GestaoEventos.Controllers
                 Name = dto.Name,
                 Price = dto.Price,
                 Quantity = dto.Quantity,
+                Category = dto.Category,
                 ImageData = imageData,
                 CreatedAt = DateTime.UtcNow
             };
