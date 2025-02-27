@@ -9,13 +9,10 @@ namespace GestaoEventos.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class EventSettingsController : ControllerBase
+    public class EventSettingsController(IWebHostEnvironment env, ApplicationDbContext context) : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        public EventSettingsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
+        private readonly IWebHostEnvironment _env = env;
 
         // GET: api/EventSettings/{eventId}
         [HttpGet("{eventId}")]
@@ -26,55 +23,100 @@ namespace GestaoEventos.Controllers
             var notifications = await _context.EventNotifications.Where(n => n.EventId == eventId).ToListAsync();
             return Ok(new { staff, products, notifications });
         }
-
-        // POST: api/EventSettings/{eventId}/staff
         [HttpPost("{eventId}/staff")]
         public async Task<IActionResult> AddStaff(int eventId, [FromBody] AddStaffDto dto)
         {
+            // Cria o registro de EventStaff
             var staff = new EventStaff
             {
                 EventId = eventId,
                 Name = dto.Name,
                 Email = dto.Email,
                 Password = dto.Password,  // Em produção, aplique um hash
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Role = UserRole.Employee // ou o valor que você definir para funcionário temporário
             };
 
             _context.EventStaffs.Add(staff);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();  // Salva primeiro para que o Id seja gerado
+
+            // Agora, verifique se o usuário correspondente já existe na tabela Users; se não, crie-o
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+            if (user == null)
+            {
+                user = new User
+                {
+                    Name = dto.Name,
+                    Email = dto.Email,
+                    PasswordHash = dto.Password, // Em produção, aplique o hash da senha
+                    Role = UserRole.Employee // Role definido para funcionário
+                };
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
             return Ok(staff);
         }
 
-        // DELETE: api/EventSettings/staff/{id}
+
         [HttpDelete("staff/{id}")]
         public async Task<IActionResult> DeleteStaff(int id)
         {
             var staff = await _context.EventStaffs.FindAsync(id);
             if (staff == null)
                 return NotFound();
+
+            // Remove o registro de EventStaff
             _context.EventStaffs.Remove(staff);
+
+            // Procura e remove o usuário correspondente na tabela Users
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == staff.Email);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+            }
+
             await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // POST: api/EventSettings/{eventId}/products
-        [HttpPost("{eventId}/products")]
-        public async Task<IActionResult> AddProduct(int eventId, [FromBody] AddProductDto dto)
+
+        // Endpoint para cadastrar produto com upload de imagem
+        // Exemplo: POST api/EventProducts/{eventId}
+        [HttpPost("products/{eventId}")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> AddProduct(int eventId, [FromForm] AddProductDto dto)
         {
+            if (dto.File == null || dto.File.Length == 0)
+            {
+                return BadRequest("Arquivo inválido.");
+            }
+
+            byte[] imageData;
+            // Lê o arquivo para um array de bytes usando MemoryStream
+            using (var ms = new MemoryStream())
+            {
+                await dto.File.CopyToAsync(ms);
+                imageData = ms.ToArray();
+            }
+
+            // Cria o registro do produto, usando os dados binários da imagem
             var product = new EventProduct
             {
                 EventId = eventId,
                 Name = dto.Name,
                 Price = dto.Price,
                 Quantity = dto.Quantity,
+                ImageData = imageData,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.EventProducts.Add(product);
             await _context.SaveChangesAsync();
+
             return Ok(product);
         }
-
+    
         // DELETE: api/EventSettings/products/{id}
         [HttpDelete("products/{id}")]
         public async Task<IActionResult> DeleteProduct(int id)

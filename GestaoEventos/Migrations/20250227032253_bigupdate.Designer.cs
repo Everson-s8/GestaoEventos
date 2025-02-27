@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250225020748_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250227032253_bigupdate")]
+    partial class bigupdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,97 @@ namespace GestaoEventos.Migrations
                     b.HasIndex("CreatedBy");
 
                     b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("GestaoEventos.Models.EventNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventNotifications");
+                });
+
+            modelBuilder.Entity("GestaoEventos.Models.EventProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<byte[]>("ImageData")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventProducts");
+                });
+
+            modelBuilder.Entity("GestaoEventos.Models.EventStaff", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EventStaffs");
                 });
 
             modelBuilder.Entity("GestaoEventos.Models.Ticket", b =>
@@ -135,6 +226,15 @@ namespace GestaoEventos.Migrations
                         .IsRequired();
 
                     b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("GestaoEventos.Models.EventStaff", b =>
+                {
+                    b.HasOne("GestaoEventos.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("GestaoEventos.Models.Ticket", b =>

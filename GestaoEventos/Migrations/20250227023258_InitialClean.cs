@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDatabaseStructure : Migration
+    public partial class InitialClean : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,6 +62,7 @@ namespace GestaoEventos.Migrations
                 {
                     table.PrimaryKey("PK_EventStaffs", x => x.Id);
                 });
+
         }
 
         /// <inheritdoc />
@@ -75,6 +76,9 @@ namespace GestaoEventos.Migrations
 
             migrationBuilder.DropTable(
                 name: "EventStaffs");
+
+
+
         }
     }
 }

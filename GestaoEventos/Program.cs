@@ -3,6 +3,7 @@ using GestaoEventos.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Configurar CORS para permitir o front-end Next.js (por exemplo, rodando em http://localhost:3000)
 builder.Services.AddCors(options =>
 {

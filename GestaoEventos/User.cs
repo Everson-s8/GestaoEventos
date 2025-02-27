@@ -5,7 +5,8 @@ namespace GestaoEventos.Models
     public enum UserRole
     {
         Client = 0,
-        EventManager = 1
+        EventManager = 1,
+        Employee = 2
     }
 
     public class User

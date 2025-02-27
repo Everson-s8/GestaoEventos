@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250226234830_UpdateDatabaseStructure")]
-    partial class UpdateDatabaseStructure
+    [Migration("20250227023258_InitialClean")]
+    partial class InitialClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -19,9 +19,9 @@ namespace GestaoEventos.Models
         [Required]
         public int Quantity { get; set; }
 
-        // Armazena a URL da imagem (após upload)
+        // Armazena os dados binários da imagem (coluna do tipo bytea no PostgreSQL)
         [Required]
-        public string ImageUrl { get; set; }
+        public byte[] ImageData { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

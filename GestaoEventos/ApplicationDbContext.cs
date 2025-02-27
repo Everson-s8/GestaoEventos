@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-
 namespace GestaoEventos.Data
 {
     public class ApplicationDbContext : DbContext
@@ -18,7 +17,7 @@ namespace GestaoEventos.Data
         public DbSet<EventStaff> EventStaffs { get; set; }
         public DbSet<EventProduct> EventProducts { get; set; }
         public DbSet<EventNotification> EventNotifications { get; set; }
-
+        public object EventProduct { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +28,10 @@ namespace GestaoEventos.Data
                 .WithMany()  
                 .HasForeignKey(e => e.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
+
         }
+
+
 
 
     }

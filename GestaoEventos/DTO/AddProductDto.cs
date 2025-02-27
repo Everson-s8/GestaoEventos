@@ -15,8 +15,6 @@ namespace GestaoEventos.DTOs
         public int Quantity { get; set; }
 
         [Required]
-        public IFormFile File { get; set; }  // Campo para o arquivo de imagem
-
-
+        public IFormFile File { get; set; }  // Recebe o arquivo de imagem
     }
 }

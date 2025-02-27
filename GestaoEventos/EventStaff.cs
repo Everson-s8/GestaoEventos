@@ -20,5 +20,8 @@ namespace GestaoEventos.Models
         public string Password { get; set; } // Em produção, armazene um hash
 
         public DateTime CreatedAt { get; set; }
+
+        [Required]
+        public UserRole Role { get; set; }
     }
 }
