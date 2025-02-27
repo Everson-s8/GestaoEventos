@@ -7,28 +7,26 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     /// <inheritdoc />
-    public partial class NomeDaMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "SenhaHash",
-                table: "Users",
-                newName: "PasswordHash");
-
-            migrationBuilder.RenameColumn(
-                name: "Nome",
-                table: "Users",
-                newName: "Name");
-
-            migrationBuilder.AlterColumn<int>(
-                name: "Role",
-                table: "Users",
-                type: "integer",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "text");
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Events",
@@ -38,24 +36,23 @@ namespace GestaoEventos.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Location = table.Column<string>(type: "text", nullable: false),
                     TotalTickets = table.Column<int>(type: "integer", nullable: false),
                     AvailableTickets = table.Column<int>(type: "integer", nullable: false),
                     ContactPhone = table.Column<string>(type: "text", nullable: false),
                     ContactEmail = table.Column<string>(type: "text", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    CreatorId = table.Column<int>(type: "integer", nullable: false)
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Events", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Events_Users_CreatorId",
-                        column: x => x.CreatorId,
+                        name: "FK_Events_Users_CreatedBy",
+                        column: x => x.CreatedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -86,9 +83,9 @@ namespace GestaoEventos.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_CreatorId",
+                name: "IX_Events_CreatedBy",
                 table: "Events",
-                column: "CreatorId");
+                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tickets_BuyerId",
@@ -110,23 +107,8 @@ namespace GestaoEventos.Migrations
             migrationBuilder.DropTable(
                 name: "Events");
 
-            migrationBuilder.RenameColumn(
-                name: "PasswordHash",
-                table: "Users",
-                newName: "SenhaHash");
-
-            migrationBuilder.RenameColumn(
-                name: "Name",
-                table: "Users",
-                newName: "Nome");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Role",
-                table: "Users",
-                type: "text",
-                nullable: false,
-                oldClrType: typeof(int),
-                oldType: "integer");
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

@@ -15,6 +15,11 @@ namespace GestaoEventos.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
 
+        public DbSet<EventStaff> EventStaffs { get; set; }
+        public DbSet<EventProduct> EventProducts { get; set; }
+        public DbSet<EventNotification> EventNotifications { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
