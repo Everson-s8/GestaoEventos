@@ -33,7 +33,7 @@ namespace GestaoEventos.Controllers
             {
                 BuyerId = dto.BuyerId,
                 OrderDate = DateTime.UtcNow,
-                Items = new System.Collections.Generic.List<OrderItem>()
+                Items = new List<OrderItem>()
             };
 
             decimal totalAmount = 0;
@@ -70,10 +70,26 @@ namespace GestaoEventos.Controllers
             order.TotalAmount = totalAmount;
 
             _context.Orders.Add(order);
-
             await _context.SaveChangesAsync();
 
-            return Ok(order);
+            // Mapeamento para OrderDto
+            var orderDto = new OrderDto
+            {
+                Id = order.Id,
+                BuyerId = order.BuyerId,
+                OrderDate = order.OrderDate,
+                TotalAmount = order.TotalAmount,
+                Items = order.Items.Select(oi => new OrderItemDto
+                {
+                    ProductId = oi.ProductId,
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice
+                }).ToList()
+            };
+
+            return Ok(orderDto);
         }
+
+
     }
 }

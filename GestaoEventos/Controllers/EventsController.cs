@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using GestaoEventos.Data;
 using GestaoEventos.Models;
+using GestaoEventos.DTOs;
 
 namespace GestaoEventos.Controllers
 {
@@ -19,7 +20,23 @@ namespace GestaoEventos.Controllers
         [HttpGet]
         public async Task<IActionResult> GetEvents()
         {
-            var events = await _context.Events.Where(e => e.Date >= DateTime.Now).ToListAsync();
+            var events = await _context.Events
+                .Where(e => e.Date >= DateTime.Now)
+                .Select(e => new EventDto
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    Description = e.Description,
+                    Date = e.Date,
+                    Location = e.Location,
+                    TotalTickets = e.TotalTickets,
+                    AvailableTickets = e.AvailableTickets,
+                    ContactPhone = e.ContactPhone,
+                    ContactEmail = e.ContactEmail,
+                    CreatedBy = e.CreatedBy
+                })
+                .ToListAsync();
+
             return Ok(events);
         }
 
