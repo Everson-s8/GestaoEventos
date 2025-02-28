@@ -34,17 +34,48 @@ namespace GestaoEventos.Controllers
 
             return Ok(user);
         }
-
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email && u.PasswordHash == dto.Password);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == dto.Email.ToLower() && u.PasswordHash == dto.Password);
             if (user == null)
                 return Unauthorized("Credenciais inválidas.");
 
-            // Aqui, você poderia gerar um token JWT e retornar junto com os dados do usuário.
-            return Ok(user);
+            // Se o usuário for funcionário (Role 2)
+            if (user.Role == UserRole.Employee)
+            {
+                // Procura o registro correspondente na tabela EventStaffs
+                var staff = await _context.EventStaffs
+                    .FirstOrDefaultAsync(s => s.Email.ToLower() == user.Email.ToLower());
+
+                if (staff == null)
+                {
+                    // Opcional: você pode criar o registro aqui ou retornar um erro
+                    return BadRequest("Funcionário não encontrado. Verifique se o registro de EventStaff existe.");
+                }
+
+                return Ok(new
+                {
+                    user.Id,
+                    user.Name,
+                    user.Email,
+                    user.Role,
+                    eventId = staff.EventId
+                });
+            }
+
+            // Para clientes e administradores
+            return Ok(new
+            {
+                user.Id,
+                user.Name,
+                user.Email,
+                user.Role
+            });
         }
+
+
     }
 
     public class RegisterDto

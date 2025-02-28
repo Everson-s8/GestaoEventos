@@ -8,16 +8,15 @@ namespace GestaoEventos.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        public int BuyerId { get; set; }
+        public int? BuyerId { get; set; }
 
-        // Propriedade de navegação para o usuário (comprador)
-        public User Buyer { get; set; }
+        public string BuyerName { get; set; }
 
         public DateTime OrderDate { get; set; }
-
         public decimal TotalAmount { get; set; }
-
         public List<OrderItem> Items { get; set; }
+
+        // Propriedade de navegação – opcional, pois pode causar ciclo, por isso não a usaremos no DTO
+        public User Buyer { get; set; }
     }
 }
