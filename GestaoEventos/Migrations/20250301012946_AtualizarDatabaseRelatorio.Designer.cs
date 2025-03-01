@@ -3,6 +3,7 @@ using System;
 using GestaoEventos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GestaoEventos.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250301012946_AtualizarDatabaseRelatorio")]
+    partial class AtualizarDatabaseRelatorio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,8 +196,6 @@ namespace GestaoEventos.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BuyerId");
-
                     b.ToTable("Orders");
                 });
 
@@ -209,7 +210,7 @@ namespace GestaoEventos.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int?>("ProductId")
                         .HasColumnType("integer");
 
                     b.Property<string>("ProductName")
@@ -296,16 +297,6 @@ namespace GestaoEventos.Migrations
                     b.Navigation("Creator");
                 });
 
-            modelBuilder.Entity("GestaoEventos.Models.Order", b =>
-                {
-                    b.HasOne("GestaoEventos.Models.User", "Buyer")
-                        .WithMany()
-                        .HasForeignKey("BuyerId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Buyer");
-                });
-
             modelBuilder.Entity("GestaoEventos.Models.OrderItem", b =>
                 {
                     b.HasOne("GestaoEventos.Models.Order", "Order")
@@ -317,8 +308,7 @@ namespace GestaoEventos.Migrations
                     b.HasOne("GestaoEventos.Models.EventProduct", "Product")
                         .WithMany()
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Order");
 

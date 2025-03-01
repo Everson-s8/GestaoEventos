@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace GestaoEventos.Models
 {
@@ -18,10 +19,14 @@ namespace GestaoEventos.Models
         [Required]
         public decimal UnitPrice { get; set; }
 
-        // Propriedade de navegação para o pedido
+        public string ProductName { get; set; }
+
+        // Quebra o ciclo – essa propriedade não será serializada para JSON.
+        [JsonIgnore]
         public Order Order { get; set; }
 
-        // Propriedade de navegação para o produto
+        // Se precisar dos dados do produto, pode manter essa propriedade.
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public EventProduct Product { get; set; }
     }
 }

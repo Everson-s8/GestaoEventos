@@ -32,12 +32,13 @@ namespace GestaoEventos.Data
                 .HasForeignKey(e => e.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuração da relação Order -> User (Buyer)
+
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.Buyer)
-                .WithMany() // ou .WithMany(u => u.Orders) se o User tiver uma coleção de Orders
-                .HasForeignKey(o => o.BuyerId)
-                .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(o => o.Buyer)
+            .WithMany() // ou, se a classe User tiver uma coleção de Orders: .WithMany(u => u.Orders)
+            .HasForeignKey(o => o.BuyerId)
+            .IsRequired(false)   // torna opcional
+            .OnDelete(DeleteBehavior.SetNull); // se o usuário for excluído, o BuyerId será nulo
 
             // Configuração da relação OrderItem -> EventProduct
             modelBuilder.Entity<OrderItem>()

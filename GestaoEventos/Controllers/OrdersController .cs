@@ -14,9 +14,41 @@ namespace GestaoEventos.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+
         public OrdersController(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        // GET: api/Orders
+        [HttpGet]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _context.Orders
+                .Include(o => o.Items) // Inclui os itens do pedido
+                .OrderBy(o => o.OrderDate) // Opcional: ordena por data
+                .ToListAsync();
+
+            // Mapeia cada Order para OrderDto
+            var orderDtos = orders.Select(o => new OrderDto
+            {
+                Id = o.Id,
+                BuyerId = o.BuyerId,
+                BuyerName = o.BuyerName,
+                OrderDate = o.OrderDate,
+                TotalAmount = o.TotalAmount,
+                Status = o.Status.ToString(),
+                Items = o.Items.Select(i => new OrderItemDto
+                {
+                    Id = i.Id,
+                    ProductId = i.ProductId,
+                    ProductName = i.ProductName,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice
+                }).ToList()
+            }).ToList();
+
+            return Ok(orderDtos);
         }
 
         // POST: api/Orders
@@ -28,16 +60,35 @@ namespace GestaoEventos.Controllers
                 return BadRequest("O pedido deve conter pelo menos um item.");
             }
 
-            // Cria o pedido
+            string buyerName = string.Empty;
+            if (dto.BuyerId != 0)
+            {
+                // Compra online: busca o usuário e obtém o nome
+                var user = await _context.Users.FindAsync(dto.BuyerId);
+                if (user == null)
+                    return BadRequest("Usuário não encontrado.");
+                buyerName = user.Name;
+            }
+            else if (!string.IsNullOrWhiteSpace(dto.BuyerName))
+            {
+                // Compra manual: usa o nome informado pelo funcionário
+                buyerName = dto.BuyerName;
+            }
+            else
+            {
+                return BadRequest("É necessário informar o BuyerId ou o BuyerName.");
+            }
+
             var order = new Order
             {
-                BuyerId = dto.BuyerId,  // Esse valor virá do token (online) ou pode ser nulo
+                BuyerId = dto.BuyerId != 0 ? dto.BuyerId : null,
+                BuyerName = buyerName,
                 OrderDate = DateTime.UtcNow,
-                Items = new System.Collections.Generic.List<OrderItem>()
+                Status = OrderStatus.Pending,
+                Items = new List<OrderItem>()
             };
 
             decimal totalAmount = 0;
-
             foreach (var itemDto in dto.Items)
             {
                 // Recupera o produto
@@ -52,13 +103,14 @@ namespace GestaoEventos.Controllers
                     return BadRequest($"Estoque insuficiente para o produto {product.Name}. Disponível: {product.Quantity}.");
                 }
 
-                // Atualiza o estoque
+                // Atualiza o estoque do produto
                 product.Quantity -= itemDto.Quantity;
 
-                // Cria o item do pedido
+                // Cria o item do pedido e salva o nome do produto
                 var orderItem = new OrderItem
                 {
-                    ProductId = itemDto.ProductId,
+                    ProductId = product.Id,
+                    ProductName = product.Name,
                     Quantity = itemDto.Quantity,
                     UnitPrice = product.Price
                 };
@@ -68,44 +120,26 @@ namespace GestaoEventos.Controllers
             }
 
             order.TotalAmount = totalAmount;
-
-            // Aqui, definimos o BuyerName:
-            // Se o pedido for online, o BuyerId já está preenchido e podemos buscar o nome do usuário.
-            // Se for manual (compra feita pelo funcionário), o front-end deve enviar o nome do cliente através de um campo adicional.
-            // Por exemplo, se o dto tiver um campo opcional BuyerName (que você pode adicionar ao CreateOrderDto).
-            if (dto is IHaveBuyerName dtoWithName && !string.IsNullOrEmpty(dtoWithName.BuyerName))
-            {
-                order.BuyerName = dtoWithName.BuyerName;
-            }
-            else if (order.BuyerId.HasValue)
-            {
-                var user = await _context.Users.FindAsync(order.BuyerId.Value);
-                order.BuyerName = user?.Name;
-            }
-
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            // Mapeia o pedido para o DTO de saída
-            var orderDto = new OrderDto
-            {
-                Id = order.Id,
-                BuyerId = order.BuyerId,
-                BuyerName = order.BuyerName,
-                OrderDate = order.OrderDate,
-                TotalAmount = order.TotalAmount,
-                Items = order.Items.Select(i => new OrderItemDto
-                {
-                    Id = i.Id,
-                    ProductId = i.ProductId,
-                    ProductName = _context.EventProducts.FirstOrDefault(p => p.Id == i.ProductId)?.Name,
-                    Quantity = i.Quantity,
-                    UnitPrice = i.UnitPrice
-                }).ToList()
-            };
-
-            return Ok(orderDto);
+            return Ok(order);
         }
+
+        [HttpPut("{id}/status")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, [FromBody] UpdateOrderStatusDto dto)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+                return NotFound("Pedido não encontrado.");
+
+            order.Status = dto.Status;
+            await _context.SaveChangesAsync();
+            return Ok(order);
+        }
+
+
+
     }
 
     // Interface opcional para que o CreateOrderDto possa incluir o BuyerName (quando necessário)
