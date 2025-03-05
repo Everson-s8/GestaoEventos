@@ -17,17 +17,19 @@ namespace GestaoEventos.Controllers
         }
 
         // GET api/events – lista eventos futuros
+        // GET api/events – lista eventos que ainda não terminaram
         [HttpGet]
         public async Task<IActionResult> GetEvents()
         {
             var events = await _context.Events
-                .Where(e => e.Date >= DateTime.Now)
+                .Where(e => e.EndDate >= DateTime.Now)
                 .Select(e => new EventDto
                 {
                     Id = e.Id,
                     Name = e.Name,
                     Description = e.Description,
                     Date = e.Date,
+                    EndDate = e.EndDate, // Certifique-se de incluir o EndDate no DTO
                     Location = e.Location,
                     TotalTickets = e.TotalTickets,
                     AvailableTickets = e.AvailableTickets,
@@ -39,6 +41,7 @@ namespace GestaoEventos.Controllers
 
             return Ok(events);
         }
+
 
         // GET api/events/{id} – detalhes de um evento
         [HttpGet("{id}")]
