@@ -7,6 +7,8 @@ namespace GestaoEventos.DTOs
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTimeOffset Date { get; set; }
+
+        public DateTimeOffset EndDate { get; set; }
         public string Location { get; set; }
         public int TotalTickets { get; set; }
         public int AvailableTickets { get; set; }

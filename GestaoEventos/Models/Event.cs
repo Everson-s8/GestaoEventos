@@ -13,6 +13,7 @@ namespace GestaoEventos.Models
         public string Description { get; set; }
 
         public DateTimeOffset Date { get; set; }
+        public DateTimeOffset EndDate { get; set; }
 
         [Required]
         public string Location { get; set; }

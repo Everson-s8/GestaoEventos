@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using GestaoEventos.Data;
 using GestaoEventos.Models;
+using GestaoEventos.DTO;
 
 namespace GestaoEventos.Controllers
 {
@@ -55,9 +56,5 @@ namespace GestaoEventos.Controllers
         }
     }
 
-    public class PurchaseTicketDto
-    {
-        public int EventId { get; set; }
-        public int BuyerId { get; set; }
-    }
+
 }

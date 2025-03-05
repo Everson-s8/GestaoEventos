@@ -2,6 +2,7 @@
 using GestaoEventos.Data;
 using Microsoft.EntityFrameworkCore;
 using GestaoEventos.Models;
+using GestaoEventos.DTO;
 
 namespace GestaoEventos.Controllers
 {
@@ -78,17 +79,4 @@ namespace GestaoEventos.Controllers
 
     }
 
-    public class RegisterDto
-    {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
-        public UserRole Role { get; set; }
-    }
-
-    public class LoginDto
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
 }

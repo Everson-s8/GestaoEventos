@@ -67,6 +67,7 @@ namespace GestaoEventos.Controllers
                 Name = dto.Name,
                 Description = dto.Description,
                 Date = dto.Date,
+                EndDate = dto.EndDate,
                 Location = dto.Location,
                 TotalTickets = dto.TotalTickets,
                 AvailableTickets = dto.TotalTickets, // ou outra lógica
@@ -102,6 +103,7 @@ namespace GestaoEventos.Controllers
             ev.Name = dto.Name;
             ev.Description = dto.Description;
             ev.Date = dto.Date;
+            ev.EndDate = dto.EndDate;
             ev.Location = dto.Location;
             ev.ContactPhone = dto.ContactPhone;
             ev.ContactEmail = dto.ContactEmail;
@@ -126,25 +128,4 @@ namespace GestaoEventos.Controllers
         }
     }
 
-    public class CreateEventDto
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public DateTime Date { get; set; }
-        public string Location { get; set; }
-        public int TotalTickets { get; set; }
-        public string ContactPhone { get; set; }
-        public string ContactEmail { get; set; }
-        public int CreatedBy { get; set; } // ID do gestor que cria o evento
-    }
-
-    public class UpdateEventDto
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public DateTime Date { get; set; }
-        public string Location { get; set; }
-        public string ContactPhone { get; set; }
-        public string ContactEmail { get; set; }
-    }
 }
