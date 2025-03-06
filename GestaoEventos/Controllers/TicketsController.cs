@@ -16,7 +16,6 @@ namespace GestaoEventos.Controllers
             _context = context;
         }
 
-        // POST api/tickets/purchase – efetua a compra de um ingresso
         [HttpPost("purchase")]
         public async Task<IActionResult> PurchaseTicket([FromBody] PurchaseTicketDto dto)
         {
@@ -24,24 +23,33 @@ namespace GestaoEventos.Controllers
             if (ev == null)
                 return NotFound("Evento não encontrado.");
 
-            if (ev.AvailableTickets <= 0)
+            // Verifica se há ingressos suficientes
+            if (ev.AvailableTickets < dto.Quantity)
                 return BadRequest("Ingressos esgotados.");
 
-            // Diminui a quantidade de ingressos disponíveis
-            ev.AvailableTickets--;
+            // Diminui a quantidade disponível pelo número de ingressos comprados
+            ev.AvailableTickets -= dto.Quantity;
 
-            var ticket = new Ticket
+            var tickets = new List<Ticket>();
+
+            // Cria um registro para cada ingresso
+            for (int i = 0; i < dto.Quantity; i++)
             {
-                EventId = ev.Id,
-                BuyerId = dto.BuyerId,
-                PurchaseDate = DateTime.UtcNow // Use UTC para evitar conflito com o PostgreSQL
-            };
+                var ticket = new Ticket
+                {
+                    EventId = ev.Id,
+                    BuyerId = dto.BuyerId,
+                    PurchaseDate = DateTime.UtcNow
+                };
+                tickets.Add(ticket);
+                _context.Tickets.Add(ticket);
+            }
 
-            _context.Tickets.Add(ticket);
             await _context.SaveChangesAsync();
 
-            return Ok(ticket);
+            return Ok(tickets);
         }
+
 
 
         // GET api/tickets/client/{clientId} – lista os ingressos comprados por um cliente
